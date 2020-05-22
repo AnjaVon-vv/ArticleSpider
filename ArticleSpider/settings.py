@@ -65,10 +65,11 @@ ROBOTSTXT_OBEY = False
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'ArticleSpider.pipelines.JsonWithEncodingPipeline': 3,
+    # 'ArticleSpider.pipelines.JsonWithEncodingPipeline': 3, # 自定义Json导出
     # 'ArticleSpider.pipelines.JsonExporterPipeline': 4, # scrapy定义的Json导出
-    # # 'scrapy.pipelines.images.ImagesPipeline': 1, # scrapy定义的image Pipeline
-    # 'ArticleSpider.pipelines.articleImagesPipeline': 1 # 使用自己定义的image Pipelines
+    'ArticleSpider.pipelines.MysqlPipeline': 5, # scrapy定义的Json导出
+    # 'scrapy.pipelines.images.ImagesPipeline': 1, # scrapy定义的image Pipeline
+    # 'ArticleSpider.pipelines.articleImagesPipeline': 2 # 使用自己定义的image Pipelines
 }
 # import os
 # IMAGES_URLS_FIELD = "image_url" # 可能需要pip安装pillow库
