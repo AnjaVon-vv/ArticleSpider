@@ -64,9 +64,18 @@ ROBOTSTXT_OBEY = False
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'ArticleSpider.pipelines.ArticlespiderPipeline': 300,
-#}
+ITEM_PIPELINES = {
+    'ArticleSpider.pipelines.JsonWithEncodingPipeline': 3,
+    # 'ArticleSpider.pipelines.JsonExporterPipeline': 4, # scrapy定义的Json导出
+    # # 'scrapy.pipelines.images.ImagesPipeline': 1, # scrapy定义的image Pipeline
+    # 'ArticleSpider.pipelines.articleImagesPipeline': 1 # 使用自己定义的image Pipelines
+}
+# import os
+# IMAGES_URLS_FIELD = "image_url" # 可能需要pip安装pillow库
+# proDir = os.path.abspath(os.path.dirname(__file__))
+# IMAGES_STORE = os.path.join(proDir, 'images')
+# IMAGES_MIN_HEIGHT =100
+# IMAGES_MIN_WIDTH =100 # 过滤高宽小于100的图片
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html

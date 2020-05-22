@@ -13,13 +13,11 @@ class ArticlespiderItem(scrapy.Item):
     # name = scrapy.Field()
     pass
 
-class ArticleItem(scrapy.Item):
+class tgbusArticleItem(scrapy.Item):
     title = scrapy.Field()
-    firstAuthor = scrapy.Field()
-    keywords = scrapy.Field()
+    author = scrapy.Field()
     abstract = scrapy.Field()
-    year = scrapy.Field()
-    refNum = scrapy.Field()
-    readNum = scrapy.Field()
-    starNum = scrapy.Field()
-    articleLink = scrapy.Field()
+    time = scrapy.Field()
+    content = scrapy.Field()
+    url = scrapy.Field()
+    urlID = scrapy.Field()
