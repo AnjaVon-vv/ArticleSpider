@@ -40,18 +40,54 @@ class JsonWithEncodingPipeline(object):
 
 
 import MySQLdb
-class MysqlPipeline(object):
-    def __init__(self):
-        self.conn = MySQLdb.connect('192.168.1.107', 'root', 'AnjaVon9170', 'Spider', charset='utf8', use_unicode=True)
-        self.cursor = self.conn.cursor()
-    def process_item(self, item, spider):
-        insert_sql = """
-            insert into tgbus(title, url, urlID)
-            VALUE (%s, %s, %s)
-        """
-        self.cursor.execute(insert_sql, (item["title"], item["url"], item["urlID"]))
-        self.conn.commit()
+import MySQLdb.cursors
+# 采用同步机制写入数据库
+# class MysqlPipeline(object):
+#     def __init__(self):
+#         self.conn = MySQLdb.connect('192.168.1.107', 'root', 'AnjaVon9170', 'Spider', charset='utf8', use_unicode=True)
+#         self.cursor = self.conn.cursor()
+#     def process_item(self, item, spider):
+#         insert_sql = """
+#             insert into tgbus(title, url, urlID, pubTime)
+#             VALUE (%s, %s, %s, %s)
+#         """
+#         self.cursor.execute(insert_sql, (item["title"], item["url"], item["urlID"], item["pubTime"])) # 同步
+#         self.conn.commit()
 
+# 异步化mysql插入与爬取
+from twisted.enterprise import adbapi
+class MyaqlTwistedPipline(object):
+    def __init__(self, dbpool):
+        self.dbpool = dbpool
+
+    @classmethod
+    def from_setting(cls, setting):
+        dbparms = dict(
+            host=setting["MYSQL_HOST"],
+            user = setting["MYSQL_USER"],
+            passwd = setting["MYSQL_PASSWORD"],
+            db = setting["MYSQL_DBNAME"],
+            charset = 'utf8',
+            cursorclass = MySQLdb.cursors.DictCursor,
+            use_unicode = True
+        )
+        dbpool = adbapi.ConnectionPool("MySQLdb", **dbparms)
+        return cls(dbpool)
+    def process_item(self, item, spider):
+        # 使用twisted实现
+        query = self.dbpool.runInteraction(self.do_insert, item)
+        # 需要额外的错误处理
+        query.addErrback(self.handle_error)
+    def handle_error(self, failure):
+        # 异步插入异常处理
+        print(failure)
+    def do_insert(self, cursor, item):
+        # 执行具体插入
+        insert_sql = """
+            insert into tgbus(urlID, title, author, pubTime, abstract, content, url)
+            VALUE (%s, %s, %s, %s, %s, %s, %s)
+        """
+        cursor.execute(insert_sql, (item["urlID"], item["title"], item["author"], item["pubTime"], item["abstract"], item["content"], item["url"]))
 
 
 

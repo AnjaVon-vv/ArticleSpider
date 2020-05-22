@@ -65,11 +65,12 @@ ROBOTSTXT_OBEY = False
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    # 'ArticleSpider.pipelines.JsonWithEncodingPipeline': 3, # 自定义Json导出
-    # 'ArticleSpider.pipelines.JsonExporterPipeline': 4, # scrapy定义的Json导出
-    'ArticleSpider.pipelines.MysqlPipeline': 5, # scrapy定义的Json导出
+    # 'ArticleSpider.pipelines.JsonWithEncodingPipeline': 2, # 自定义Json导出
+    # 'ArticleSpider.pipelines.JsonExporterPipeline': 2, # scrapy定义的Json导出
+    # 'ArticleSpider.pipelines.MysqlPipeline': 3, # 同步插入数据
+    'ArticleSpider.pipelines.MysqlTwistedPipeline': 3, # 异步插入数据
     # 'scrapy.pipelines.images.ImagesPipeline': 1, # scrapy定义的image Pipeline
-    # 'ArticleSpider.pipelines.articleImagesPipeline': 2 # 使用自己定义的image Pipelines
+    # 'ArticleSpider.pipelines.articleImagesPipeline': 1 # 使用自己定义的image Pipelines
 }
 # import os
 # IMAGES_URLS_FIELD = "image_url" # 可能需要pip安装pillow库
@@ -80,7 +81,7 @@ ITEM_PIPELINES = {
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
-#AUTOTHROTTLE_ENABLED = True
+AUTOTHROTTLE_ENABLED = True
 # The initial download delay
 #AUTOTHROTTLE_START_DELAY = 5
 # The maximum download delay to be set in case of high latencies
@@ -98,3 +99,8 @@ ITEM_PIPELINES = {
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+MYSQL_HOST = '192.168.1.107'
+MYSQL_USER =  'root'
+MYSQL_PASSWORD = 'AnjaVon9170'
+MYSQL_DBNAME = 'Spider'

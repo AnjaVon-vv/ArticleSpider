@@ -28,7 +28,7 @@ class TgbusSpider(scrapy.Spider):
         global pn
         spn = str(pn)
         next_url = 'https://www.tgbus.com/list/all/' + spn
-        if pn >= 5:
+        if pn >= 3:
             self.crawler.engine.close_spider(self, "已是最后一页，关闭spider")
         else:
             pn = pn + 1
@@ -51,10 +51,6 @@ class TgbusSpider(scrapy.Spider):
             info = response.css(".info-box")
         author = info.css(":nth-child(4)::text").extract_first("Unknown")
         date_time = info.css("i::text").extract_first("Unknown").replace("  ", " ")
-        try:
-            date_time = datetime.datetime.strptime(date_time, '%Y-%m-%d %H:%M') # 转为datetime类型
-        except Exception as e:
-            date_time = datetime.datetime.now()  # 出错改为当前时间
         # 摘要
         abstract = response.css(".description div::text")
         if abstract:
@@ -68,8 +64,11 @@ class TgbusSpider(scrapy.Spider):
         tgArticleItem = tgbusArticleItem()
         tgArticleItem["title"] = title
         tgArticleItem["author"] = author
-        tgArticleItem["pubDate"] = date_time.date()
-        tgArticleItem["pubTime"] = date_time.time()
+        try:
+            date_time = datetime.datetime.strptime(date_time, '%Y-%m-%d %H:%M') # 转为datetime类型
+        except Exception as e:
+            date_time = datetime.datetime.now()  # 出错改为当前时间
+        tgArticleItem["pubTime"] = date_time
         tgArticleItem["abstract"] = abstract
         tgArticleItem["content"] = content
         tgArticleItem["url"] = response.url

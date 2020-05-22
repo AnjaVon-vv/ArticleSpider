@@ -17,7 +17,6 @@ class tgbusArticleItem(scrapy.Item):
     title = scrapy.Field()
     author = scrapy.Field()
     abstract = scrapy.Field()
-    pubDate = scrapy.Field()
     pubTime = scrapy.Field()
     content = scrapy.Field()
     url = scrapy.Field()
