@@ -56,7 +56,7 @@ import MySQLdb.cursors
 
 # 异步化mysql插入与爬取
 from twisted.enterprise import adbapi
-class MyaqlTwistedPipline(object):
+class MysqlTwistedPipeline(object):
     def __init__(self, dbpool):
         self.dbpool = dbpool
 
