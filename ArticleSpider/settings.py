@@ -65,10 +65,11 @@ ROBOTSTXT_OBEY = False
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
+    'ArticleSpider.pipelines.ElasticsearchPipeline': 4, # 存入ES
     # 'ArticleSpider.pipelines.JsonWithEncodingPipeline': 2, # 自定义Json导出
     # 'ArticleSpider.pipelines.JsonExporterPipeline': 2, # scrapy定义的Json导出
     # 'ArticleSpider.pipelines.MysqlPipeline': 3, # 同步插入数据
-    'ArticleSpider.pipelines.MysqlTwistedPipeline': 3, # 异步插入数据
+    # 'ArticleSpider.pipelines.MysqlTwistedPipeline': 3, # 异步插入数据
     # 'scrapy.pipelines.images.ImagesPipeline': 1, # scrapy定义的image Pipeline
     # 'ArticleSpider.pipelines.articleImagesPipeline': 1 # 使用自己定义的image Pipelines
 }

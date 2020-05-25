@@ -81,8 +81,8 @@ class TgbusSpider(scrapy.Spider):
         tgArticleItem["url"] = response.url
 
         # 通过Itemloader加载item
+        # 结合提取和实例化item，简化代码
         # from scrapy.loader import ItemLoader
-        # 结合提取和实例化item
         # # 调用自定义的itemLoader
         # from ArticleSpider.items import ArticleItemLoader
         # itemLoader = ArticleItemLoader(item=tgbusArticleItem(), response=response)

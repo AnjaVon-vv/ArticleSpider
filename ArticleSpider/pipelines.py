@@ -96,11 +96,20 @@ class MysqlTwistedPipeline(object):
 
 
 
+# 将数据写入es
+class ElasticsearchPipeline(object):
+    def process_item(self, item, spider):
+        # 将item转换为es数据
+        item.save_to_es()
+
+
+
 # 自定义pipeline下载图片并保存图片路径
 # from scrapy.pipelines.images import ImagesPipeline
 # class articleImagePipeline(ImagesPipeline):
 #     def item_completed(self, results, item, info):
-#         for ok, value in results:
-#             imageFilePath = value["path"]
+#         if "url" in item:
+#             for ok, value in results:
+#                 imageFilePath = value["path"]
 #         item["imagePath"] = imageFilePath
 #         return item

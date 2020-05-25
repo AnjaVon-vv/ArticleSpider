@@ -13,6 +13,28 @@ class ArticlespiderItem(scrapy.Item):
     # name = scrapy.Field()
     pass
 
+
+
+from ArticleSpider.spiders.models.esTypes import tgbusType
+from elasticsearch_dsl.connections import connections
+es = connections.create_connection(tgbusType._doc_type.using)
+def gen_sugg(index, info_tuple):
+    # 根据字符串生成搜索建议数组
+    usedWds = set()  # 用于去重，以先到的权重为准
+    suggestion = []
+    for txt, weight in info_tuple:
+        if txt:
+            # 调用ESanalyze接口分析字符串
+            wds = es.indices.analyze(index=index, params={'filter': ["lowercase"]}, body={'text':txt,'analyzer':"ik_max_word"})
+            analyWds = set([r["token"] for r in wds if len(r["token"]) > 1])  # 过滤单字
+            newWds = analyWds - usedWds
+        else:
+            newWds = set()
+        if newWds:
+            suggestion.append({"input": list(newWds), "weight": weight})
+    return suggestion
+# from w3lib.html import remove_tags
+# remove_tags() 去除html标签
 class tgbusArticleItem(scrapy.Item):
     title = scrapy.Field()
     author = scrapy.Field()
@@ -22,6 +44,21 @@ class tgbusArticleItem(scrapy.Item):
     content = scrapy.Field()
     url = scrapy.Field()
     urlID = scrapy.Field()
+
+    def save_to_es(self):
+        article = tgbusType()
+        article.title = self['title']
+        article.author = self['author']
+        article.keywords = self['keywords']
+        article.abstract = self['abstract']
+        article.pubTime = self['pubTime']
+        article.content = self['content']
+        article.url = self['url']
+        article.meta.id = self['urlID']
+        article.suggestion = gen_sugg(tgbusType._doc_type.index, ((article.title, 7), (article.abstract, 3), (article.keywords, 3)))
+        article.save()
+        return
+
 
 # 通过Itemloader加载item
 # def add_tgbus(value):
