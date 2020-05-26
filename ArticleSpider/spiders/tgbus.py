@@ -30,7 +30,8 @@ class TgbusSpider(scrapy.Spider):
         global pn
         spn = str(pn)
         next_url = 'https://www.tgbus.com/list/all/' + spn
-        if pn >= 7: # 爬500页
+        if pn >= 501: # 爬500页
+            print("爬取" + pn-1 + "页！！！")
             self.crawler.engine.close_spider(self, "已是最后一页，关闭spider")
         else:
             pn = pn + 1

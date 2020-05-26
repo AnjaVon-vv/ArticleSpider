@@ -34,8 +34,13 @@ def gen_sugg(index, info_tuple):
         if newWds:
             suggestion.append({"input": list(newWds), "weight": weight})
     return suggestion
+
 # from w3lib.html import remove_tags
 # remove_tags() 去除html标签
+import redis
+# redisClient = redis.StrictRedis()
+redisClient = redis.StrictRedis(host='192.168.1.106')
+
 class tgbusArticleItem(scrapy.Item):
     title = scrapy.Field()
     author = scrapy.Field()
@@ -56,8 +61,13 @@ class tgbusArticleItem(scrapy.Item):
         article.content = self['content']
         article.url = self['url']
         article.meta.id = self['urlID']
+
         article.suggestion = gen_sugg(tgbusType._doc_type.index, ((article.title, 7), (article.abstract, 3), (article.keywords, 3)))
+
         article.save()
+
+        redisClient.incr("tgbusCnt")
+
         return
 
 
