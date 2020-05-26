@@ -7,7 +7,6 @@
 
 import scrapy
 
-
 class ArticlespiderItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
@@ -16,8 +15,10 @@ class ArticlespiderItem(scrapy.Item):
 
 
 from ArticleSpider.spiders.models.esTypes import tgbusType
-from elasticsearch_dsl.connections import connections
+from elasticsearch_dsl import connections
 es = connections.create_connection(tgbusType._doc_type.using)
+# .virtualenvs/aricle/lib/python3.7/site-packages/elasticsearch/connection/http_urllib3.py
+# host:'192.168.1.106'
 def gen_sugg(index, info_tuple):
     # 根据字符串生成搜索建议数组
     usedWds = set()  # 用于去重，以先到的权重为准
@@ -25,8 +26,8 @@ def gen_sugg(index, info_tuple):
     for txt, weight in info_tuple:
         if txt:
             # 调用ESanalyze接口分析字符串
-            wds = es.indices.analyze(index=index, params={'filter': ["lowercase"]}, body={'text':txt,'analyzer':"ik_max_word"})
-            analyWds = set([r["token"] for r in wds if len(r["token"]) > 1])  # 过滤单字
+            wds = es.indices.analyze(index=index, body={'text':txt, 'analyzer':"ik_max_word"}, params={'filter': ["lowercase"]})
+            analyWds = set([r["token"] for r in wds["tokens"] if len(r["token"]) > 1])  # 过滤单字
             newWds = analyWds - usedWds
         else:
             newWds = set()
@@ -44,7 +45,7 @@ class tgbusArticleItem(scrapy.Item):
     content = scrapy.Field()
     url = scrapy.Field()
     urlID = scrapy.Field()
-
+    # 存为es的type
     def save_to_es(self):
         article = tgbusType()
         article.title = self['title']
