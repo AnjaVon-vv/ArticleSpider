@@ -15,8 +15,8 @@ class TgbusSpider(scrapy.Spider):
     name = 'tgbus'
     # allowed_domains = ['https://www.tgbus.com', 'https://tech.tgbus.com']
     start_urls = ['https://www.tgbus.com/list/all/']
-    # start_urls = ['https://www.tgbus.com/news/124939']  #Test
-    # start_urls = ['https://tech.tgbus.com/news/124955']  #Test
+    # start_urls = ['https://www.tgbus.com/news/124939']  #游戏Test
+    # start_urls = ['https://tech.tgbus.com/news/124955']  #科技Test
 
     def parse(self, response):
         # 获取文章具体url并交给解析函数
@@ -31,7 +31,7 @@ class TgbusSpider(scrapy.Spider):
         spn = str(pn)
         next_url = 'https://www.tgbus.com/list/all/' + spn
         if pn >= 501: # 爬500页
-            print("爬取" + pn-1 + "页！！！")
+            print("爬取%s页！！！" % str(pn-1))
             self.crawler.engine.close_spider(self, "已是最后一页，关闭spider")
         else:
             pn = pn + 1
@@ -59,12 +59,23 @@ class TgbusSpider(scrapy.Spider):
         # 摘要
         abstract = response.css(".description div::text")
         if abstract:
-            abstract = abstract.extract_first()
+            abstract = abstract.extract_first("Noting in abstract!")
         else:
-            abstract = response.css(".summary::text").extract_first()
+            abstract = response.css(".summary::text").extract_first("Noting in abstract!")
         # 正文数组
         content = response.css(".article-main-contentraw p::text").extract() #不定长数组
         content = ''.join(content) # 将爬取到的数组连接为字符串（避免插入数据库出错）
+        # 相关新闻urlID
+        relate = response.css(".tb-recommend-hot__lists li a::attr(href)")
+        if relate:
+            relate = relate.extract()
+        else:
+            relate = response.css(".special-card a::attr(href)").extract()
+        relate = relate[:5]
+        # 初始PR值，避免空值出现
+        PR = 0.3
+
+
 
         # 实例化Item
         tgArticleItem = tgbusArticleItem()
@@ -80,6 +91,8 @@ class TgbusSpider(scrapy.Spider):
         tgArticleItem["abstract"] = abstract
         tgArticleItem["content"] = content
         tgArticleItem["url"] = response.url
+        tgArticleItem["relate"] = relate
+        tgArticleItem["PR"] = PR
 
         # 通过Itemloader加载item
         # 结合提取和实例化item，简化代码

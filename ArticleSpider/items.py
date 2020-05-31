@@ -25,7 +25,7 @@ def gen_sugg(index, info_tuple):
     suggestion = []
     for txt, weight in info_tuple:
         if txt:
-            # 调用ESanalyze接口分析字符串
+            # 调用ES analyze接口分析字符串
             wds = es.indices.analyze(index=index, body={'text':txt, 'analyzer':"ik_max_word"}, params={'filter': ["lowercase"]})
             analyWds = set([r["token"] for r in wds["tokens"] if len(r["token"]) > 1])  # 过滤单字
             newWds = analyWds - usedWds
@@ -50,6 +50,8 @@ class tgbusArticleItem(scrapy.Item):
     content = scrapy.Field()
     url = scrapy.Field()
     urlID = scrapy.Field()
+    relate = scrapy.Field()
+    PR = scrapy.Field()
     # 存为es的type
     def save_to_es(self):
         article = tgbusType()
@@ -59,8 +61,12 @@ class tgbusArticleItem(scrapy.Item):
         article.abstract = self['abstract']
         article.pubTime = self['pubTime']
         article.content = self['content']
-        article.url = self['url']
         article.meta.id = self['urlID']
+        article.url = self['url']
+        article.relate = self["relate"]
+        article.PR = self["PR"]
+        # article.urls.relate = self["relate"]
+        # article.urls.io = self['url']
 
         article.suggestion = gen_sugg(tgbusType._doc_type.index, ((article.title, 7), (article.abstract, 3), (article.keywords, 3)))
 

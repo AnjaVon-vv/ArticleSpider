@@ -1,6 +1,6 @@
 __author__ = 'Von'
 
-from elasticsearch_dsl import DocType, Date, Completion, Keyword, Text
+from elasticsearch_dsl import DocType, Date, Completion, Keyword, Text, HalfFloat
 
 from elasticsearch_dsl.connections import connections
 connections.create_connection(hosts=["192.168.1.106"])
@@ -21,11 +21,16 @@ class tgbusType(DocType):
     abstract = Text()
     pubTime = Date()
     content = Text(analyzer="ik_max_word")
+    PR = HalfFloat()
     url = Keyword()
+    relate = Keyword()
+    # urls = Nested()
 
     class Meta:
         index = "tgbus"
-        doc_type = "article"
+        doc_type = "von"
+        # index = "test"
+        # doc_type = "t"
 
 # 根据type生成mapping
 if __name__ == "__main__":
