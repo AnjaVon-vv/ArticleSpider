@@ -27,7 +27,7 @@ def getUrl(sR):
 
 def writeFile(url, hits):
     # 将规则写入文件
-    f = open("input", "w")
+    f = open("input", "a")
     for hit in hits:
         f.write(hit + ' ' + url + '\n')
     return
@@ -39,6 +39,7 @@ def clearFile():
     f.truncate()
     return
 
+x = 1 # 全局变量，用于计数算了多少个
 def updatePR(art, pr):
     # 更新页面PR值
     client.index(
@@ -59,6 +60,8 @@ def updatePR(art, pr):
         }
     )
     print("修改%s完成" % str(art["_source"]["url"]))
+    global x
+    x = x+1
     return
 
 def calPR():
@@ -100,9 +103,8 @@ def calPR():
                     i = i + 1
                 pagerank()
             else:
-                # 无与当前页面相关的项
-                # 将当前文章PR值设为特定值
-                updatePR(hitA, 0.23333333)
+                # 无与当前页面相关的项、将当前文章PR值设为特定值
+                updatePR(hitA, 0.00002333)
     return
 
 
@@ -123,7 +125,7 @@ def pagerank():
 
     N = len(nodes)
 
-    # 将节点ID映射为数字，便于后面生成A矩阵/S矩阵
+    # 将节点ID映射为数字，便于后面生成矩阵
     i = 0
     node_to_num = {}
     for node in nodes:
@@ -150,8 +152,7 @@ def pagerank():
                 S[i, j] = 1 / N
     # print(S)
 
-    # 计算矩阵A
-    d = 0.85
+    d = 0.85 # 阻尼系数
     A = d * S + (1 - d) / N * np.ones([N, N])
     # print(A)
 
@@ -173,6 +174,8 @@ def pagerank():
 
     print('final result:', pn)
     # 将计算所得PR数值写回
+        # 改进方法：修改es数据结构对应url、relate和PR放入nested文档减少查询次数
+                     # 更新时只写入PR
     i = 0
     for node in nodes:
         res = client.search(
@@ -192,3 +195,11 @@ def pagerank():
 
 if __name__ == '__main__':
     calPR()
+    calPR()
+    calPR()
+    calPR()
+    calPR()
+    calPR()
+    calPR()
+    calPR()
+    print(x) # 计数

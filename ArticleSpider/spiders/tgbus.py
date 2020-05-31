@@ -43,10 +43,10 @@ class TgbusSpider(scrapy.Spider):
         # 标题
         title = response.css("h1 span::text")
         if title:
-            title = title.extract_first()
+            title = title.extract_first("Nothing in title?!")
             keywords = "游戏"
         else:
-            title = response.css("div.title::text").extract_first()
+            title = response.css("div.title::text").extract_first("Nothing in title?!")
             keywords = "科技"
         # 作者、发布日期和时间
         info = response.css(".article-main__sourceInfo h5")
@@ -59,20 +59,26 @@ class TgbusSpider(scrapy.Spider):
         # 摘要
         abstract = response.css(".description div::text")
         if abstract:
-            abstract = abstract.extract_first("Noting in abstract!")
+            abstract = abstract.extract_first("Noting in abstract?!")
         else:
-            abstract = response.css(".summary::text").extract_first("Noting in abstract!")
+            abstract = response.css(".summary::text").extract_first("Noting in abstract?!")
         # 正文数组
         content = response.css(".article-main-contentraw p::text").extract() #不定长数组
-        content = ''.join(content) # 将爬取到的数组连接为字符串（避免插入数据库出错）
+        if content:
+            content = ''.join(content) # 将爬取到的数组连接为字符串（避免插入数据库出错）
+        else:
+            content = "Nothing in content?!" # 404页面处理，避免后续出错
         # 相关新闻urlID
         relate = response.css(".tb-recommend-hot__lists li a::attr(href)")
         if relate:
             relate = relate.extract()
         else:
             relate = response.css(".special-card a::attr(href)").extract()
-        relate = relate[:5]
-        # 初始PR值，避免空值出现
+        if relate:
+            relate = relate[:5]
+        else:
+            relate = "Nothing in relate?!" # 404
+        # 初始化PR值
         PR = 0.3
 
 
