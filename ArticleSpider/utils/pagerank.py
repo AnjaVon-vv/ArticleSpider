@@ -15,7 +15,9 @@ def searchRelate(url):
                 "term": {
                     "relate": url
                 }
-            }
+            },
+            "from": 0,
+            "size": 10000
         }
     )
     return response["hits"]["hits"]
@@ -39,7 +41,7 @@ def clearFile():
     f.truncate()
     return
 
-x = 1 # 全局变量，用于计数算了多少个
+x = 1 # 全局变量，计数算了多少个，用于核查
 def updatePR(art, pr):
     # 更新页面PR值
     client.index(
@@ -73,7 +75,9 @@ def calPR():
                 "term": {
                     "PR": 0.3
                 }
-            }
+            },
+            "from": 0,
+            "size": 10000
         }
     )
     for hitA in response_all["hits"]["hits"]:
@@ -105,6 +109,7 @@ def calPR():
             else:
                 # 无与当前页面相关的项、将当前文章PR值设为特定值
                 updatePR(hitA, 0.00002333)
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
     return
 
 
@@ -121,7 +126,7 @@ def pagerank():
             nodes.append(edge[0])
         if edge[1] not in nodes:
             nodes.append(edge[1])
-    print(nodes)
+    # print(nodes)
 
     N = len(nodes)
 
@@ -190,16 +195,11 @@ def pagerank():
             }
         )
         updatePR(res["hits"]["hits"][0], pn[i])
+        print("%d```%d" % (i, N))
         i = i + 1
 
 
 if __name__ == '__main__':
     calPR()
-    calPR()
-    calPR()
-    calPR()
-    calPR()
-    calPR()
-    calPR()
-    calPR()
-    print(x) # 计数
+
+    print(x-1) # 计数
